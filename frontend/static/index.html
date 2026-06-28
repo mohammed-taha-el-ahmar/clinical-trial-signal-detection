@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmaSight — Trial Safety Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark">Rx</span>
+        <span class="brand-name">PharmaSight</span>
+        <span class="brand-sub">Trial Safety Monitor</span>
+      </div>
+      <div class="live-indicator">
+        <span class="pulse-dot"></span>
+        <span class="live-label">LIVE</span>
+        <span class="live-time" id="live-time">--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPI Strip -->
+  <section class="kpi-strip">
+    <div class="kpi" id="kpi-events">
+      <div class="kpi-value" id="kpi-events-val">—</div>
+      <div class="kpi-label">Events Today</div>
+    </div>
+    <div class="kpi kpi-signal" id="kpi-signals">
+      <div class="kpi-value" id="kpi-signals-val">—</div>
+      <div class="kpi-label">Active Signals</div>
+    </div>
+    <div class="kpi" id="kpi-trials">
+      <div class="kpi-value" id="kpi-trials-val">—</div>
+      <div class="kpi-label">Trials Monitored</div>
+    </div>
+    <div class="kpi" id="kpi-sites">
+      <div class="kpi-value" id="kpi-sites-val">—</div>
+      <div class="kpi-label">Sites Reporting</div>
+    </div>
+  </section>
+
+  <!-- Main grid -->
+  <main class="dashboard-grid">
+
+    <!-- Signal alerts panel -->
+    <section class="panel panel--signals">
+      <div class="panel-header">
+        <span class="panel-title">Safety Signals</span>
+        <button class="btn-rerun" id="btn-rerun">Re-run Detection</button>
+      </div>
+      <div class="signal-list" id="signal-list">
+        <div class="empty-state">Loading signals…</div>
+      </div>
+    </section>
+
+    <!-- Severity distribution -->
+    <section class="panel panel--severity">
+      <div class="panel-header">
+        <span class="panel-title">Events by Severity</span>
+      </div>
+      <div class="bar-chart" id="severity-chart"></div>
+    </section>
+
+    <!-- Trial arm distribution -->
+    <section class="panel panel--arm">
+      <div class="panel-header">
+        <span class="panel-title">Events by Trial Arm</span>
+      </div>
+      <div class="bar-chart" id="arm-chart"></div>
+    </section>
+
+    <!-- Top symptoms -->
+    <section class="panel panel--symptoms">
+      <div class="panel-header">
+        <span class="panel-title">Top Reported Symptoms</span>
+      </div>
+      <div class="symptom-list" id="symptom-list"></div>
+    </section>
+
+    <!-- Recent events feed -->
+    <section class="panel panel--feed">
+      <div class="panel-header">
+        <span class="panel-title">Event Feed</span>
+        <span class="feed-badge" id="feed-badge">0</span>
+      </div>
+      <div class="event-feed" id="event-feed">
+        <div class="empty-state">Loading events…</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

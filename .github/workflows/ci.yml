@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+  UV_CACHE_DIR: /tmp/.uv-cache
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run ruff check
+        run: uv run ruff check .
+
+      - name: Run ruff format check
+        run: uv run ruff format --check .
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run unit tests
+        run: uv run pytest tests/test_signal_detection.py -v --tb=short
+
+      - name: Run integration tests
+        run: uv run pytest tests/test_integration.py -v --tb=short
+
+  smoke:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run API smoke tests
+        run: uv run pytest tests/test_api_smoke.py -v --tb=short
+
+      - name: Server start smoke test
+        run: |
+          uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 &
+          SERVER_PID=$!
+          sleep 3
+
+          # Health endpoint
+          echo "=== Health check ==="
+          curl -sf http://localhost:8000/api/health | python -m json.tool
+
+          # Stats endpoint
+          echo "=== Stats check ==="
+          curl -sf http://localhost:8000/api/stats | python -m json.tool | head -20
+
+          # Events endpoint
+          echo "=== Events check ==="
+          curl -sf "http://localhost:8000/api/events?limit=3" | python -m json.tool | head -20
+
+          # Signals endpoint
+          echo "=== Signals check ==="
+          curl -sf http://localhost:8000/api/signals | python -m json.tool | head -20
+
+          # Dashboard HTML
+          echo "=== Dashboard check ==="
+          curl -sf http://localhost:8000 | grep -o '<title>.*</title>'
+
+          # Detection endpoint
+          echo "=== Detection trigger ==="
+          curl -sf -X POST http://localhost:8000/api/detect | python -m json.tool
+
+          # Static assets
+          echo "=== Static assets check ==="
+          curl -sf -o /dev/null -w "%{http_code}" http://localhost:8000/static/style.css
+          echo ""
+          curl -sf -o /dev/null -w "%{http_code}" http://localhost:8000/static/app.js
+          echo ""
+
+          kill $SERVER_PID
+          echo "=== All smoke tests passed ==="
+
+  all-tests:
+    name: All Tests Summary
+    needs: [lint, test, smoke]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.smoke.result }}" != "success" ]; then
+            echo "One or more jobs failed"
+            exit 1
+          fi
+          echo "All CI checks passed ✓"

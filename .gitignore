@@ -1,0 +1,49 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ─────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+.python-version
+
+# ── Environment / secrets ────────────────────────────────────────────────────
+.env
+.env.local
+*.pem
+*.key
+
+# ── IDE ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Testing / coverage ──────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# ── Simulator fixtures (regenerated) ─────────────────────────────────────────
+simulator/fixtures.json
+
+# ── Terraform ────────────────────────────────────────────────────────────────
+infra/terraform/.terraform/
+infra/terraform/.terraform.lock.hcl
+infra/terraform/terraform.tfstate*
+infra/terraform/*.tfvars
+!infra/terraform/*.tfvars.example
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
